@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             });
 
-            console.log('Conversation History before API call:', conversationHistory);
+
             const data = await response.json();
             if (data.candidates && data.candidates.length > 0) {
                 currentApiKeyIndex = 0; // Reset index on successful call
