@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         appendMessage(message, 'user-message');
         conversationHistory.push({ role: 'user', parts: [{ text: message }] });
-        console.log('Conversation History (after user message):', conversationHistory);
+
         userInput.value = '';
 
         // Call Gemini API
@@ -26,8 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function callGemini() {
-        const GEMINI_API_KEY = 'AIzaSyAn6oQ-q6X2WyRJiEwE4D8MEh6tG4GZPPU'; // Replace with your actual API key
-        const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+        // IMPORTANT: For production, do NOT hardcode your API key directly in client-side code.
+        // Use a secure backend or a proxy to handle your API key.
+        const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY'; // Replace with your actual API key
+        const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`; // Updated model to gemini-1.5-flash
 
         try {
             const response = await fetch(API_ENDPOINT, {
@@ -65,12 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await response.json();
-            console.log('Gemini API Response:', data);
             if (data.candidates && data.candidates.length > 0) {
                 const aiResponse = data.candidates[0].content.parts[0].text;
                 conversationHistory.push({ role: 'model', parts: [{ text: aiResponse }] });
                 appendMessage(aiResponse, 'ai-message');
-                console.log('Conversation History (after AI message):', conversationHistory);
             } else {
                 appendMessage('Error: Could not get a response from AI.', 'ai-message');
             }
