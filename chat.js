@@ -74,8 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log('Conversation History before API call:', conversationHistory);
             const data = await response.json();
-            console.log('Gemini API Response Status:', response.status);
-            console.log('Gemini API Response Data:', data);
             if (data.candidates && data.candidates.length > 0) {
                 currentApiKeyIndex = 0; // Reset index on successful call
 
@@ -90,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 callGemini(); // Retry with the new key
             }
         } catch (error) {
-            console.error('Error calling Gemini API:', error);
             // Switch to next API key on error
             currentApiKeyIndex = (currentApiKeyIndex + 1) % GEMINI_API_KEYS.length;
             // Do not display error message, just retry with the new key
