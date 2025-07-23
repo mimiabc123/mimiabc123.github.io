@@ -28,7 +28,13 @@ document.addEventListener('DOMContentLoaded', () => {
     async function callGemini() {
         // IMPORTANT: For production, do NOT hardcode your API key directly in client-side code.
         // Use a secure backend or a proxy to handle your API key.
-        const GEMINI_API_KEY = 'AIzaSyB9yg4oYjnb76hQ5LRm8h9wO7VHtMRzMfg'; // Replace with your actual API key
+        const GEMINI_API_KEYS = [
+            'AIzaSyAsClpFDCzE7cZnisI103BjgY1Q6j3O_A4',
+            'AIzaSyCl0sodJIecalWcn8yLpWsZZQSL70DJLig',
+            'AIzaSyDEEkd_HXXllC883uGv8RMkoWU184bhLNQ',
+        ];
+        let currentApiKeyIndex = 0; // Index to keep track of the current API key
+        const GEMINI_API_KEY = GEMINI_API_KEYS[currentApiKeyIndex];
         const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`; // Updated model to gemini-1.5-flash
 
         try {
@@ -38,7 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    contents: [{ role: 'user', parts: [{ text: conversationHistory[conversationHistory.length - 1].parts[0].text }] }],
+                    contents: conversationHistory.map(entry => ({
+                        role: entry.role === 'user' ? 'user' : 'model',
+                        parts: entry.parts.map(part => ({ text: part.text }))
+                    })),
                     generationConfig: {
                         temperature: 0.7,
                         topK: 40,
@@ -66,19 +75,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             });
 
+            console.log('Conversation History before API call:', conversationHistory);
             const data = await response.json();
             console.log('Gemini API Response Status:', response.status);
             console.log('Gemini API Response Data:', data);
             if (data.candidates && data.candidates.length > 0) {
+                currentApiKeyIndex = 0; // Reset index on successful call
+
                 const aiResponse = data.candidates[0].content.parts[0].text;
-                conversationHistory.push({ role: 'model', parts: [{ text: aiResponse }] });
+                // Ensure aiResponse is a string before pushing to history for robustness
+                conversationHistory.push({ role: 'model', parts: [{ text: String(aiResponse) }] });
                 appendMessage(aiResponse, 'ai-message');
             } else {
-                appendMessage('Error: Could not get a response from AI.', 'ai-message');
+                // Switch to next API key on error
+                currentApiKeyIndex = (currentApiKeyIndex + 1) % GEMINI_API_KEYS.length;
+                appendMessage(`Error: Could not get a response from AI. Switching to next API key (${currentApiKeyIndex + 1}/${GEMINI_API_KEYS.length}).`, 'ai-message');
+                // Optionally, retry the call with the new key immediately
+                // callGemini();
             }
         } catch (error) {
             console.error('Error calling Gemini API:', error);
-            appendMessage('Error: Failed to connect to AI.', 'ai-message');
+            // Switch to next API key on error
+            currentApiKeyIndex = (currentApiKeyIndex + 1) % GEMINI_API_KEYS.length;
+            appendMessage(`Error: Failed to connect to AI. Switching to next API key (${currentApiKeyIndex + 1}/${GEMINI_API_KEYS.length}).`, 'ai-message');
+            // Optionally, retry the call with the new key immediately
+            // callGemini();
         }
     }
 
