@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
             'AIzaSyAsClpFDCzE7cZnisI103BjgY1Q6j3O_A4',
             'AIzaSyCl0sodJIecalWcn8yLpWsZZQSL70DJLig',
             'AIzaSyDEEkd_HXXllC883uGv8RMkoWU184bhLNQ',
-            'AIzaSyAYbGxlx3C0-B5nsWoiNV_sU5Iv6ZbcL9o',
         ];
         // currentApiKeyIndex is now a global variable, defined outside callGemini
         const GEMINI_API_KEY = GEMINI_API_KEYS[currentApiKeyIndex];
@@ -87,16 +86,14 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 // Switch to next API key on error
                 currentApiKeyIndex = (currentApiKeyIndex + 1) % GEMINI_API_KEYS.length;
-                appendMessage(`Error: Could not get a response from AI. Switching to next API key (${currentApiKeyIndex + 1}/${GEMINI_API_KEYS.length}).`, 'ai-message');
-                // Optionally, retry the call with the new key immediately
+                // Do not display error message, just retry with the new key
                 callGemini(); // Retry with the new key
             }
         } catch (error) {
             console.error('Error calling Gemini API:', error);
             // Switch to next API key on error
             currentApiKeyIndex = (currentApiKeyIndex + 1) % GEMINI_API_KEYS.length;
-            appendMessage(`Error: Failed to connect to AI. Switching to next API key (${currentApiKeyIndex + 1}/${GEMINI_API_KEYS.length}).`, 'ai-message');
-            // Optionally, retry the call with the new key immediately
+            // Do not display error message, just retry with the new key
             callGemini(); // Retry with the new key
         }
     }
