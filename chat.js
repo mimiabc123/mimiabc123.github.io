@@ -32,9 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
             'AIzaSyAsClpFDCzE7cZnisI103BjgY1Q6j3O_A4',
             'AIzaSyCl0sodJIecalWcn8yLpWsZZQSL70DJLig',
             'AIzaSyDEEkd_HXXllC883uGv8RMkoWU184bhLNQ',
-            'AIzaSyAYbGxlx3C0-B5nsWoiNV_sU5Iv6ZbcL9o',
         ];
-        let currentApiKeyIndex = 0; // Index to keep track of the current API key
+        // currentApiKeyIndex is now a global variable, defined outside callGemini
         const GEMINI_API_KEY = GEMINI_API_KEYS[currentApiKeyIndex];
         const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`; // Updated model to gemini-1.5-flash
 
@@ -45,10 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    contents: conversationHistory.map(entry => ({
-                        role: entry.role === 'user' ? 'user' : 'model',
-                        parts: entry.parts.map(part => ({ text: part.text }))
-                    })),
+                    contents: conversationHistory,
                     generationConfig: {
                         temperature: 0.7,
                         topK: 40,
@@ -92,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentApiKeyIndex = (currentApiKeyIndex + 1) % GEMINI_API_KEYS.length;
                 appendMessage(`Error: Could not get a response from AI. Switching to next API key (${currentApiKeyIndex + 1}/${GEMINI_API_KEYS.length}).`, 'ai-message');
                 // Optionally, retry the call with the new key immediately
-                // callGemini();
+                callGemini(); // Retry with the new key
             }
         } catch (error) {
             console.error('Error calling Gemini API:', error);
@@ -100,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentApiKeyIndex = (currentApiKeyIndex + 1) % GEMINI_API_KEYS.length;
             appendMessage(`Error: Failed to connect to AI. Switching to next API key (${currentApiKeyIndex + 1}/${GEMINI_API_KEYS.length}).`, 'ai-message');
             // Optionally, retry the call with the new key immediately
-            // callGemini();
+            callGemini(); // Retry with the new key
         }
     }
 
@@ -112,3 +108,5 @@ document.addEventListener('DOMContentLoaded', () => {
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 });
+
+let currentApiKeyIndex = 0; // Initialize currentApiKeyIndex globally
