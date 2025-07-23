@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function callGemini() {
         // IMPORTANT: For production, do NOT hardcode your API key directly in client-side code.
         // Use a secure backend or a proxy to handle your API key.
-        const GEMINI_API_KEY = 'AIzaSyAsClpFDCzE7cZnisI103BjgY1Q6j3O_A4'; // Replace with your actual API key
+        const GEMINI_API_KEY = 'AIzaSyB9yg4oYjnb76hQ5LRm8h9wO7VHtMRzMfg'; // Replace with your actual API key
         const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`; // Updated model to gemini-1.5-flash
 
         try {
