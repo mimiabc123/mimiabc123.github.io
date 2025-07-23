@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         appendMessage(message, 'user-message');
         conversationHistory.push({ role: 'user', parts: [{ text: message }] });
+        console.log('Conversation History (after user message):', conversationHistory);
         userInput.value = '';
 
         // Call Gemini API
@@ -35,15 +36,41 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    contents: conversationHistory
+                    contents: conversationHistory,
+                    generationConfig: {
+                        temperature: 0.7,
+                        topK: 40,
+                        topP: 0.95,
+                        maxOutputTokens: 1024,
+                    },
+                    safetySettings: [
+                        {
+                            category: 'HARM_CATEGORY_HARASSMENT',
+                            threshold: 'BLOCK_NONE',
+                        },
+                        {
+                            category: 'HARM_CATEGORY_HATE_SPEECH',
+                            threshold: 'BLOCK_NONE',
+                        },
+                        {
+                            category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                            threshold: 'BLOCK_NONE',
+                        },
+                        {
+                            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                            threshold: 'BLOCK_NONE',
+                        },
+                    ],
                 })
             });
 
             const data = await response.json();
+            console.log('Gemini API Response:', data);
             if (data.candidates && data.candidates.length > 0) {
                 const aiResponse = data.candidates[0].content.parts[0].text;
                 conversationHistory.push({ role: 'model', parts: [{ text: aiResponse }] });
                 appendMessage(aiResponse, 'ai-message');
+                console.log('Conversation History (after AI message):', conversationHistory);
             } else {
                 appendMessage('Error: Could not get a response from AI.', 'ai-message');
             }
