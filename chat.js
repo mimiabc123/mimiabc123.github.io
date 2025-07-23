@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'AIzaSyAsClpFDCzE7cZnisI103BjgY1Q6j3O_A4',
             'AIzaSyCl0sodJIecalWcn8yLpWsZZQSL70DJLig',
             'AIzaSyDEEkd_HXXllC883uGv8RMkoWU184bhLNQ',
+            'AIzaSyAYbGxlx3C0-B5nsWoiNV_sU5Iv6ZbcL9o',
         ];
         // currentApiKeyIndex is now a global variable, defined outside callGemini
         const GEMINI_API_KEY = GEMINI_API_KEYS[currentApiKeyIndex];
