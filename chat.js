@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    contents: conversationHistory,
+                    contents: [{ role: 'user', parts: [{ text: conversationHistory[conversationHistory.length - 1].parts[0].text }] }],
                     generationConfig: {
                         temperature: 0.7,
                         topK: 40,
@@ -67,6 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await response.json();
+            console.log('Gemini API Response Status:', response.status);
+            console.log('Gemini API Response Data:', data);
             if (data.candidates && data.candidates.length > 0) {
                 const aiResponse = data.candidates[0].content.parts[0].text;
                 conversationHistory.push({ role: 'model', parts: [{ text: aiResponse }] });
