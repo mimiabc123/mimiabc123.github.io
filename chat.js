@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const userInput = document.getElementById('user-input');
     const sendButton = document.getElementById('send-button');
 
+    let conversationHistory = [];
+
     sendButton.addEventListener('click', sendMessage);
     userInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
@@ -15,13 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (message === '') return;
 
         appendMessage(message, 'user-message');
+        conversationHistory.push({ role: 'user', parts: [{ text: message }] });
         userInput.value = '';
 
         // Call Gemini API
-        callGemini(message);
+        callGemini();
     }
 
-    async function callGemini(prompt) {
+    async function callGemini() {
         const GEMINI_API_KEY = 'AIzaSyAn6oQ-q6X2WyRJiEwE4D8MEh6tG4GZPPU'; // Replace with your actual API key
         const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
 
@@ -32,17 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
-                    }]
+                    contents: conversationHistory
                 })
             });
 
             const data = await response.json();
             if (data.candidates && data.candidates.length > 0) {
                 const aiResponse = data.candidates[0].content.parts[0].text;
+                conversationHistory.push({ role: 'model', parts: [{ text: aiResponse }] });
                 appendMessage(aiResponse, 'ai-message');
             } else {
                 appendMessage('Error: Could not get a response from AI.', 'ai-message');
